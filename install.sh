@@ -8,6 +8,6 @@ dir=`pwd`
 
 cd /usr/local/bin/
 
-ln -s dir/ethcluster.sh ./ethcluster
+ln -s $dir/ethcluster.sh ./ethcluster
 
 cd $dir
