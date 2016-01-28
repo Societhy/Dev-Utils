@@ -1,6 +1,7 @@
 # !/bin/zsh
 
 datadir=$HOME/.ethereum/societhest
+ethdir=$HOME/.ethereum
 
 help()
 {
@@ -37,10 +38,10 @@ cluster()
     
     for ((i=1 ; i<nodes; ++i)); do
     	echo 'launching node '$i'...'
-    	cmd="geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $datadir/geth.ipc --port 4030$i --rpc --rpcapi admin,eth,miner --rpcport 810$i --networkid 8587"
+    	cmd="geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $ethdir/geth.ipc --port 4030$i --rpc --rpcapi admin,eth,miner --rpcport 810$i --networkid 8587"
     	nohup $cmd &>/dev/null &
     	sleep 3
-    	geth --exec "admin.nodeInfo.enode" attach ipc:$datadir/geth.ipc >> /tmp/clusterEnodes
+    	geth --exec "admin.nodeInfo.enode" attach ipc:$ethdir/geth.ipc >> /tmp/clusterEnodes
     done
     
     for ((i=1 ; i<nodes; ++i)); do
