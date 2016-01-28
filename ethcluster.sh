@@ -1,7 +1,6 @@
 # !/bin/zsh
 
 datadir=$HOME/.ethereum/societhest
-nodeNumber=$2
 
 help()
 {
@@ -9,9 +8,15 @@ help()
     echo "	ethcluster [options] command [arguments]"
     echo
     echo COMMANDS:
-    echo "	create	<N>	créé N noeuds connectés sur un réseau privé"
-    echo "	attach	<N>	connection à l'API json-rpc du noeud N"
-    echo "	kill		détruit le cluster"
+    echo "	create	<N>		créé N noeuds connectés sur un réseau privé"
+    echo "	attach	<N>		connection à l'API json-rpc du noeud N"
+    echo "	kill			détruit le cluster"
+    echo "	deploy	<N> <contract>	déploie le contract sur la blockchain privée depuis le noeud N !!!!!!!!!!!!! NON IMPLÉMENTÉ"
+    echo
+    echo OPTIONS:
+    echo "	--unlock		les comptes des noeuds sont unlock au lancement !!!! NON IMPLÉMENTÉ"
+    echo "	--mine			les noeuds minent au lancement !!!! NON IMPLÉMENTÉ"
+    echo "	--dir </path/to/dir>	dossier ou sont stockés les clefs et la blockchain !!!! NON IMPLÉMENTÉ"
     echo
 }
 
@@ -33,7 +38,7 @@ cluster()
     for ((i=1 ; i<nodes; ++i)); do
     	echo 'launching node '$i'...'
     	cmd="geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $datadir/geth.ipc --port 4030$i --rpc --rpcapi admin,eth,miner --rpcport 810$i --networkid 8587"
-    	nohup $cmd & 2> /dev/null
+    	nohup $cmd &>/dev/null &
     	sleep 3
     	geth --exec "admin.nodeInfo.enode" attach ipc:$datadir/geth.ipc >> /tmp/clusterEnodes
     done
@@ -43,18 +48,18 @@ cluster()
     	while read -r enode; do
     	    if [ "$i" -ne "$exclude" ]; then
     		echo "connecting node" $i "to enode" $enode
-    		geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i
+    		nohup geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i &>/dev/null &
     	    fi
     	    ((exclude+=1))
     	done < /tmp/clusterEnodes
     done
 }
 
-if [ $1 = "create" ]; then
+if [ "$1" = "create" ]; then
     cluster $2
-elif [ $1 = "attach" ]; then
+elif [ "$1" = "attach" ]; then
     attach $2
-elif [ $1 = "kill" ]; then
+elif [ "$1" = "kill" ]; then
     kill
 else
     help

@@ -15,4 +15,8 @@ Script bash qui fournit les fonctionnalités suivantes :
 
 INSTALLATION :
 
+git clone git@github.com:Societhy/Dev-Utils.git
+
+cd Dev-Utils
+
 sudo ./install.sh
