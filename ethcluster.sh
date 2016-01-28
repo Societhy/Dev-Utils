@@ -1,7 +1,8 @@
 # !/bin/zsh
 
-datadir=$HOME/.ethereum/societhest
-ethdir=$HOME/.ethereum
+usrdir=$HOME
+datadir=$usrdir/.ethereum/societhest
+ethdir=$usrdir/.ethereum
 
 help()
 {
@@ -23,7 +24,7 @@ help()
 
 kill()
 {
-    killall -QUIT geth
+    sudo killall -QUIT geth
 }
 
 attach()
@@ -35,13 +36,14 @@ cluster()
 {
     truncate -s 0 /tmp/clusterEnodes
     local nodes=$(($1 + 1))
-    
+
     for ((i=1 ; i<nodes; ++i)); do
     	echo 'launching node '$i'...'
-    	cmd="geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $ethdir/geth.ipc --port 4030$i --rpc --rpcapi admin,eth,miner --rpcport 810$i --networkid 8587"
+    	cmd="sudo geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $ethdir/geth.ipc --port 4030$i --rpc --rpcapi admin,eth,miner --rpcport 810$i --networkid 8587"
     	nohup $cmd &>/dev/null &
     	sleep 3
-    	geth --exec "admin.nodeInfo.enode" attach ipc:$ethdir/geth.ipc >> /tmp/clusterEnodes
+    	mdr=`sudo geth --exec "admin.nodeInfo.enode" attach ipc:$ethdir/geth.ipc | grep \"` 
+    	echo $mdr >> /tmp/clusterEnodes
     done
     
     for ((i=1 ; i<nodes; ++i)); do
@@ -49,7 +51,7 @@ cluster()
     	while read -r enode; do
     	    if [ "$i" -ne "$exclude" ]; then
     		echo "connecting node" $i "to enode" $enode
-    		nohup geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i &>/dev/null &
+    		nohup sudo geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i &>/dev/null &
     	    fi
     	    ((exclude+=1))
     	done < /tmp/clusterEnodes
@@ -57,10 +59,12 @@ cluster()
 }
 
 if [ "$1" = "create" ]; then
+    sudo ls>/dev/null
     cluster $2
 elif [ "$1" = "attach" ]; then
     attach $2
 elif [ "$1" = "kill" ]; then
+    sudo ls>/dev/null
     kill
 else
     help
