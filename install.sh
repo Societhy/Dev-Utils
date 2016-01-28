@@ -2,8 +2,6 @@
 
 mkdir $HOME/.ethereum/societhest
 
-cp $HOME/.ethereum/geth.ipc $HOME/.ethereum/societhest
-
 cp genesis.json $HOME/.ethereum/societhest
 
 dir=`pwd`
