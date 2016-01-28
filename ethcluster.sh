@@ -1,9 +1,5 @@
 # !/bin/zsh
 
-usrdir=$HOME
-datadir=$usrdir/.ethereum/societhest
-ethdir=$usrdir/.ethereum
-
 help()
 {
     echo USAGE:
@@ -16,9 +12,9 @@ help()
     echo "	deploy	<N> <contract>	déploie le contract sur la blockchain privée depuis le noeud N !!!!!!!!!!!!! NON IMPLÉMENTÉ"
     echo
     echo OPTIONS:
-    echo "	--unlock		les comptes des noeuds sont unlock au lancement !!!! NON IMPLÉMENTÉ"
-    echo "	--mine			les noeuds minent au lancement !!!! NON IMPLÉMENTÉ"
-    echo "	--dir </path/to/dir>	dossier ou sont stockés les clefs et la blockchain !!!! NON IMPLÉMENTÉ"
+    echo "	--unlock		les comptes des noeuds sont unlock au lancement"
+    echo "	--mine			les noeuds minent au lancement"
+    echo "	--dir </path/to/dir>	dossier ou sont stockés les clefs et la blockchain"
     echo
 }
 
@@ -36,14 +32,15 @@ cluster()
 {
     truncate -s 0 /tmp/clusterEnodes
     local nodes=$(($1 + 1))
-
+    
     for ((i=1 ; i<nodes; ++i)); do
     	echo 'launching node '$i'...'
-    	cmd="sudo geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $ethdir/geth.ipc --port 4030$i --rpc --rpcapi admin,eth,miner --rpcport 810$i --networkid 8587"
+    	cmd="sudo geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $datadir/geth.ipc --port 4030$i --rpc --rpcapi admin,eth,miner,personal,web3 --rpcport 810$i --networkid 8587 $mine $unlock"
     	nohup $cmd &>/dev/null &
-    	sleep 3
-    	mdr=`sudo geth --exec "admin.nodeInfo.enode" attach ipc:$ethdir/geth.ipc | grep \"` 
-    	echo $mdr >> /tmp/clusterEnodes
+	mine=''
+    	sleep 5
+    	addr=`sudo geth --exec "admin.nodeInfo.enode" attach ipc:$datadir/geth.ipc | grep \"` 
+    	echo $addr >> /tmp/clusterEnodes
     done
     
     for ((i=1 ; i<nodes; ++i)); do
@@ -51,21 +48,41 @@ cluster()
     	while read -r enode; do
     	    if [ "$i" -ne "$exclude" ]; then
     		echo "connecting node" $i "to enode" $enode
-    		nohup sudo geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i &>/dev/null &
+    		geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i
+		usleep 400000
     	    fi
     	    ((exclude+=1))
     	done < /tmp/clusterEnodes
     done
 }
 
-if [ "$1" = "create" ]; then
-    sudo ls>/dev/null
-    cluster $2
-elif [ "$1" = "attach" ]; then
-    attach $2
-elif [ "$1" = "kill" ]; then
-    sudo ls>/dev/null
-    kill
-else
-    help
-fi
+mine=''
+unlock=''
+usrdir=$HOME
+datadir=$usrdir/.ethereum/societhest
+ethdir=$usrdir/.ethereum
+
+for ((i=0; i<$#; ++i)); do
+    if [ "$1" = "create" ]; then
+	sudo ls>/dev/null
+	cluster $2
+	break
+    elif [ "$1" = "attach" ]; then
+	attach $2
+	break
+    elif [ "$1" = "kill" ]; then
+	sudo ls>/dev/null
+	kill
+	break
+    elif [ "$1" = "--mine" ]; then
+	mine="--mine --minerthreads 1"
+    elif [ "$1" = "--unlock" ]; then
+	unlock = "--unlock 0 --password /dev/null"
+    elif [ "$1" = "--dir" ]; then
+	datadir=$2
+	shift
+    else
+	help
+    fi
+    shift
+done
