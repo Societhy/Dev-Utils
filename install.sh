@@ -12,4 +12,4 @@ cd /usr/local/bin/
 
 ln -s dir/ethcluster.sh ./ethcluster
 
-cd dir
+cd $dir
