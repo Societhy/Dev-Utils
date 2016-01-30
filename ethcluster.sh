@@ -35,8 +35,7 @@ cluster()
     
     for ((i=1 ; i<nodes; ++i)); do
     	echo 'launching node '$i'...'
-    	cmd="sudo geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $datadir/geth.ipc --port 4030$i --rpc --rpcapi admin,eth,miner,personal,web3 --rpcport 810$i --networkid 8587 $mine $unlock"
-    	nohup $cmd &>/dev/null &
+    	nohup sudo geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $datadir/geth.ipc --port 4030$i --rpc --rpcport 810$i --rpcapi "web3,admin,eth,personal" --rpccorsdomain '*' --networkid 8587 $mine $unlock &>/dev/null &
 	mine=''
     	sleep 5
     	addr=`sudo geth --exec "admin.nodeInfo.enode" attach ipc:$datadir/geth.ipc | grep \"` 
@@ -49,7 +48,7 @@ cluster()
     	    if [ "$i" -ne "$exclude" ]; then
     		echo "connecting node" $i "to enode" $enode
     		geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i
-		usleep 400000
+    		usleep 400000
     	    fi
     	    ((exclude+=1))
     	done < /tmp/clusterEnodes
@@ -61,8 +60,8 @@ unlock=''
 usrdir=$HOME
 datadir=$usrdir/.ethereum/societhest
 ethdir=$usrdir/.ethereum
-
-for ((i=0; i<$#; ++i)); do
+nbArg=$#
+for ((i=0; i<nbArg; ++i)); do
     if [ "$1" = "create" ]; then
 	sudo ls>/dev/null
 	cluster $2
@@ -77,7 +76,7 @@ for ((i=0; i<$#; ++i)); do
     elif [ "$1" = "--mine" ]; then
 	mine="--mine --minerthreads 1"
     elif [ "$1" = "--unlock" ]; then
-	unlock = "--unlock 0 --password /dev/null"
+	unlock="--unlock 0 --password /dev/null"
     elif [ "$1" = "--dir" ]; then
 	datadir=$2
 	shift
