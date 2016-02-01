@@ -47,8 +47,8 @@ cluster()
     	while read -r enode; do
     	    if [ "$i" -ne "$exclude" ]; then
     		echo "connecting node" $i "to enode" $enode
-    		geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i
-    		usleep 400000
+    		sudo geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i
+    		sleep 1
     	    fi
     	    ((exclude+=1))
     	done < /tmp/clusterEnodes
