@@ -25,3 +25,26 @@ git clone git@github.com:Societhy/Dev-Utils.git
 cd Dev-Utils
 
 sudo ./install.sh
+
+
+USAGE :
+
+      ethcluster [options] command [arguments]
+
+
+      COMMANDS:
+
+	create	<N>		créé N noeuds connectés sur un réseau privé
+
+	attach	<N>		connection à l'API json-rpc du noeud N
+
+	kill			détruit le cluster
+
+
+      OPTIONS:
+
+	--unlock		les comptes des noeuds sont unlock au lancement
+
+	--mine	    	        les noeuds minent au lancement
+
+	--dir </path/to/dir>    dossier ou sont stockés les clefs et la blockchain

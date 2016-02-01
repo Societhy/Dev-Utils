@@ -9,7 +9,6 @@ help()
     echo "	create	<N>		créé N noeuds connectés sur un réseau privé"
     echo "	attach	<N>		connection à l'API json-rpc du noeud N"
     echo "	kill			détruit le cluster"
-    echo "	deploy	<N> <contract>	déploie le contract sur la blockchain privée depuis le noeud N !!!!!!!!!!!!! NON IMPLÉMENTÉ"
     echo
     echo OPTIONS:
     echo "	--unlock		les comptes des noeuds sont unlock au lancement"
