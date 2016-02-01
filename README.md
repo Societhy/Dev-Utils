@@ -13,6 +13,11 @@ Script bash qui fournit les fonctionnalités suivantes :
        - destruction du cluster
 
 
+PRÉREQUIS :
+
+geth
+
+
 INSTALLATION :
 
 git clone git@github.com:Societhy/Dev-Utils.git
