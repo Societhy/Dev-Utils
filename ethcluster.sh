@@ -1,4 +1,4 @@
-# !/bin/zsh
+#!/bin/bash
 
 help()
 {
@@ -37,7 +37,7 @@ cluster()
     	nohup sudo geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $datadir/geth.ipc --port 4030$i --rpc --rpcport 810$i --rpcapi "web3,admin,eth,personal,net" --rpccorsdomain '*' --networkid 8587 $mine $unlock &>/dev/null &
 	mine=''
     	sleep 5
-    	addr=`sudo geth --exec "admin.nodeInfo.enode" attach ipc:$datadir/geth.ipc | grep \"` 
+    	addr=`sudo geth --exec "admin.nodeInfo.enode" attach rpc:http://localhost:810$i | grep \"` 
     	echo $addr >> /tmp/clusterEnodes
     done
     
