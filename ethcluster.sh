@@ -9,12 +9,18 @@ help()
     echo "	create	<N>		créé N noeuds connectés sur un réseau privé"
     echo "	attach	<N>		connection à l'API json-rpc du noeud N"
     echo "	kill			détruit le cluster"
+    echo "	clear			erase blockchain data (starts a new one)"
     echo
     echo OPTIONS:
     echo "	--unlock		les comptes des noeuds sont unlock au lancement"
     echo "	--mine			les noeuds minent au lancement"
     echo "	--dir </path/to/dir>	dossier ou sont stockés les clefs et la blockchain"
     echo
+}
+
+clear()
+{
+    sudo rm -rf $datadir/**/chaindata/
 }
 
 kill()
@@ -67,6 +73,9 @@ for ((i=0; i<nbArg; ++i)); do
 	break
     elif [ "$1" = "attach" ]; then
 	attach $2
+	break
+    elif [ "$1" = "clear" ]; then
+	clear
 	break
     elif [ "$1" = "kill" ]; then
 	sudo ls>/dev/null
