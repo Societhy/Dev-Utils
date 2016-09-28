@@ -35,7 +35,7 @@ attach()
 
 relay()
 {
-    geth --rpc --rpcaddr 10.224.9.117 --rpcport 28017 --port 3001
+    nohup geth --rpc --rpcaddr 10.224.9.117 --rpcport 28017 --port 3001 &>/dev/null &
 }
 
 connect()
