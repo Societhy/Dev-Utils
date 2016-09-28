@@ -33,9 +33,14 @@ attach()
     geth attach rpc:http://localhost:8101
 }
 
+relay()
+{
+    geth --rpc --rpcaddr 10.224.9.117 --rpcport 28017 --port 3001
+}
+
 connect()
 {
-    geth attach http://163.5.84.117:21017
+    geth attach http://163.5.84.117:28017
 }
 
 cluster()
@@ -85,6 +90,9 @@ for ((i=0; i<nbArg; ++i)); do
     break
     elif [ "$1" = "connect" ]; then
     connect
+    break
+    elif [ "$1" = "relay" ]; then
+    relay
     break
     elif [ "$1" = "kill" ]; then
 	ls>/dev/null
