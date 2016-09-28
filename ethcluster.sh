@@ -20,17 +20,22 @@ help()
 
 clear()
 {
-    sudo rm -rf $datadir/**/chaindata/
+    rm -rf $datadir/**/chaindata/
 }
 
 kill()
 {
-    sudo killall -QUIT geth
+    killall -QUIT geth
 }
 
 attach()
 {
-    geth attach rpc:http://localhost:810$1
+    geth attach rpc:http://localhost:8101
+}
+
+connect()
+{
+    geth attach http://163.5.84.117:21017
 }
 
 cluster()
@@ -39,11 +44,12 @@ cluster()
     local nodes=$(($1 + 1))
     
     for ((i=1 ; i<nodes; ++i)); do
-    	echo 'launching node '$i'...'
-    	nohup sudo geth --genesis $datadir/genesis.json --datadir $datadir/0$i --ipcpath $datadir/geth.ipc --port 4030$i --rpc --rpcport 810$i --rpcapi "web3,admin,eth,personal,net" --rpccorsdomain '*' --networkid 8587 $mine $unlock &>/dev/null &
-	mine=''
+        echo 'launching node '$i'...'
+        echo "geth --datadir $datadir/0$i --ipcdisable --port 4030$i --rpc --rpcport 810$i --rpcapi \"web3,admin,eth,personal,net\" --rpccorsdomain '*' --networkid 8587 $mine $unlock &>/dev/null &"
+        nohup geth --datadir $datadir/0$i --ipcdisable --port 4030$i --rpc --rpcport 810$i --rpcapi "web3,admin,eth,personal,net" --rpccorsdomain '*' --networkid 8587 $mine $unlock &>/dev/null &
+	    mine=''
     	sleep 5
-    	addr=`sudo geth --exec "admin.nodeInfo.enode" attach rpc:http://localhost:810$i | grep \"` 
+    	addr=`geth --datadir $datadir/0$i --exec "admin.nodeInfo.enode" attach rpc:http://localhost:810$i | grep \"` 
     	echo $addr >> /tmp/clusterEnodes
     done
     
@@ -52,7 +58,7 @@ cluster()
     	while read -r enode; do
     	    if [ "$i" -ne "$exclude" ]; then
     		echo "connecting node" $i "to enode" $enode
-    		sudo geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i
+    		geth --exec "admin.addPeer($enode)"  attach rpc:http://localhost:810$i
     		sleep 1
     	    fi
     	    ((exclude+=1))
@@ -68,17 +74,20 @@ ethdir=$usrdir/.ethereum
 nbArg=$#
 for ((i=0; i<nbArg; ++i)); do
     if [ "$1" = "create" ]; then
-	sudo ls>/dev/null
+	ls>/dev/null
 	cluster $2
 	break
     elif [ "$1" = "attach" ]; then
 	attach $2
 	break
     elif [ "$1" = "clear" ]; then
-	clear
-	break
+    clear
+    break
+    elif [ "$1" = "connect" ]; then
+    connect
+    break
     elif [ "$1" = "kill" ]; then
-	sudo ls>/dev/null
+	ls>/dev/null
 	kill
 	break
     elif [ "$1" = "--mine" ]; then

@@ -38,7 +38,11 @@ USAGE :
 
 	attach	<N>		connection à l'API json-rpc du noeud N
 
-	kill			détruit le cluster
+	connect 		connection à l'API json-rpc du noeud sur le serveur
+
+	relay			lance un noeud et ouvre l'api aux requêtes externes (à lancer sur le serveur)
+
+	kill			détruit tous les processus 'geth'
 
 
       OPTIONS:

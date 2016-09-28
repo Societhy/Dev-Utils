@@ -1,5 +1,6 @@
 # !/bin/bash
 
+mkdir $HOME/.ethereum
 mkdir $HOME/.ethereum/societhest
 
 cp genesis.json $HOME/.ethereum/societhest
